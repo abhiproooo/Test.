@@ -39,10 +39,12 @@ jobs:
     - name: Compile with SCons
       run: |
         cd godot-cpp
-        scons platform=android target=template_debug arch=arm64 use_llvm=yes api_version=4.7
+        # Added generate_bindings=yes and changed the target to build the static library
+        scons platform=android target=template_debug arch=arm64 use_llvm=yes api_version=4.7 generate_bindings=yes
 
     - name: Upload Compiled Library
       uses: actions/upload-artifact@v4
       with:
         name: android-libs
-        path: godot-cpp/bin/*.so
+        # Changed the path to look for the .a static library, which is what this build produces
+        path: godot-cpp/bin/*.a
