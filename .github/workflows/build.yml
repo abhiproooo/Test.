@@ -21,17 +21,12 @@ jobs:
     - name: Install SCons
       run: pip install scons
 
-    # Download the NDK and put it EXACTLY where godot-cpp expects it
     - name: Setup Android NDK
       run: |
         wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
         unzip android-ndk-r26b-linux.zip
-        
-        # Create a fake Android SDK folder and put the NDK inside it
         mkdir -p $GITHUB_WORKSPACE/android-sdk/ndk
         mv android-ndk-r26b $GITHUB_WORKSPACE/android-sdk/ndk/28.1.13356709
-        
-        # Tell the system to use our fake SDK instead of the pre-installed one
         echo "ANDROID_HOME=$GITHUB_WORKSPACE/android-sdk" >> $GITHUB_ENV
         echo "ANDROID_SDK_ROOT=$GITHUB_WORKSPACE/android-sdk" >> $GITHUB_ENV
 
@@ -41,11 +36,10 @@ jobs:
         cd godot-cpp
         git submodule update --init --recursive
 
-    # Compile the bindings
     - name: Compile with SCons
       run: |
         cd godot-cpp
-        scons platform=android target=template_debug arch=arm64 use_llvm=yes
+        scons platform=android target=template_debug arch=arm64 use_llvm=yes api_version=4.7
 
     - name: Upload Compiled Library
       uses: actions/upload-artifact@v4
