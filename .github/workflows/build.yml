@@ -1,0 +1,49 @@
+name: Build Godot C++ Extension
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # This lets you run it manually
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.x'
+
+    - name: Install SCons
+      run: pip install scons
+
+    # This is the magic step: installing the x86_64 Android NDK on the server
+    - name: Setup Android NDK
+      run: |
+        wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
+        unzip android-ndk-r26b-linux.zip
+        echo "ANDROID_NDK_HOME=$GITHUB_WORKSPACE/android-ndk-r26b" >> $GITHUB_ENV
+
+    # Download the Godot C++ bindings
+    - name: Clone Godot C++
+      run: |
+        git clone https://github.com/godotengine/godot-cpp.git
+        cd godot-cpp
+        git submodule update --init --recursive
+
+    # Compile the bindings for Android ARM64
+    - name: Compile with SCons
+      run: |
+        cd godot-cpp
+        scons platform=android target=template_debug arch=arm64 use_llvm=yes api_version=4.7
+
+    # Upload the resulting .so file so you can download it to your phone
+    - name: Upload Compiled Library
+      uses: actions/upload-artifact@v4
+      with:
+        name: android-libs
+        path: godot-cpp/bin/*.so
