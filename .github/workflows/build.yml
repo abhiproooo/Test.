@@ -21,7 +21,7 @@ jobs:
     - name: Install SCons
       run: pip install scons
 
-    # This is the magic step: installing the x86_64 Android NDK on the server
+    # Download and extract the official Android NDK for x86_64 Linux servers
     - name: Setup Android NDK
       run: |
         wget https://dl.google.com/android/repository/android-ndk-r26b-linux.zip
@@ -39,7 +39,7 @@ jobs:
     - name: Compile with SCons
       run: |
         cd godot-cpp
-        scons platform=android target=template_debug arch=arm64 use_llvm=yes api_version=4.7
+        scons platform=android target=template_debug arch=arm64 use_llvm=yes ndk_path=$ANDROID_NDK_HOME
 
     # Upload the resulting .so file so you can download it to your phone
     - name: Upload Compiled Library
