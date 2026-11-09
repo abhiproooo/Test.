@@ -1,7 +1,8 @@
 #include "VectorCanvas.h"
 #include <godot_cpp/core/class_db.hpp>
-#include <godot_cpp/classes/input_event.hpp> // <--- ADDED THIS
+#include <godot_cpp/classes/input_event.hpp>
 #include <godot_cpp/classes/input_event_screen_touch.hpp>
+#include <godot_cpp/classes/viewport.hpp> // <--- ADDED THIS LINE
 
 using namespace godot;
 
@@ -17,7 +18,9 @@ void VectorCanvas::add_point(const Vector2 &p_point) {
 void VectorCanvas::_unhandled_input(const Ref<InputEvent> &p_event) {
     Ref<InputEventScreenTouch> touch = p_event;
     if (touch.is_valid() && touch->is_pressed()) {
-        Vector2 local_pos = get_global_mouse_position();
+        // Instead of relying on global mouse position which can glitch on some Android setups,
+        // we use the touch event's exact position and convert it to our Canvas local space.
+        Vector2 local_pos = make_input_local(touch)->get_position();
         add_point(local_pos);
         get_viewport()->set_input_as_handled();
     }
