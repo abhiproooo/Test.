@@ -5,14 +5,19 @@
 #include <godot_cpp/variant/packed_vector2_array.hpp>
 #include "VectorPoint.h"
 #include <vector>
+#include <map>
 
 class VectorCanvas : public godot::Node2D {
     GDCLASS(VectorCanvas, godot::Node2D)
 private:
     std::vector<VectorPoint> points;
+    int active_tool = 0; // 0 = None, 1 = Add Point, 2 = Select
+    std::map<int, godot::Vector2> active_touches; // Tracks fingers for gestures
+
 protected:
     static void _bind_methods();
 public:
+    void set_tool(int p_tool);
     void add_point(const godot::Vector2 &p_point);
     void _draw() override;
     void _unhandled_input(const godot::Ref<godot::InputEvent> &p_event) override;
