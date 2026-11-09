@@ -23,6 +23,7 @@ void VectorCanvas::_unhandled_input(const Ref<InputEvent> &p_event) {
     Ref<InputEventScreenTouch> touch = p_event;
     Ref<InputEventScreenDrag> drag = p_event;
 
+    // --- GESTURE TRACKING ---
     if (touch.is_valid()) {
         if (touch->is_pressed()) {
             active_touches[touch->get_index()] = touch->get_position();
@@ -35,14 +36,18 @@ void VectorCanvas::_unhandled_input(const Ref<InputEvent> &p_event) {
         active_touches[drag->get_index()] = drag->get_position();
         
         if (active_touches.size() >= 2) {
-            return;
+            // TWO FINGERS: Pan/Zoom logic goes here later.
+            // For now, this prevents drawing when 2 fingers are on screen.
+            return; 
         } else if (active_touches.size() == 1) {
-            if (active_tool == 1) {
+            // SINGLE FINGER LOGIC
+            if (active_tool == 1) { // Add Point Tool
                 add_point(drag->get_position());
             }
         }
     }
     
+    // Also handle single taps (not drags)
     if (touch.is_valid() && touch->is_pressed() && active_touches.size() == 1) {
         if (active_tool == 1) {
             add_point(touch->get_position());
@@ -51,14 +56,19 @@ void VectorCanvas::_unhandled_input(const Ref<InputEvent> &p_event) {
 }
 
 void VectorCanvas::_draw() {
-    draw_rect(Rect2(-5000, -5000, 10000, 10000), Color(1, 1, 1));
+    // 1. Draw the white canvas (matches screen size instead of a fixed 10000x10000)
+    Rect2 screen_rect = get_viewport_rect();
+    draw_rect(screen_rect, Color(1, 1, 1));
 
-    Color cross_color(0.8f, 0.8f, 0.8f);
-    draw_line(Vector2(-15, 0), Vector2(15, 0), cross_color, 2.0f);
-    draw_line(Vector2(0, -15), Vector2(0, 15), cross_color, 2.0f);
+    // 2. Draw the Center Origin Cross (Grey +) in the exact middle of the screen
+    Vector2 center = screen_rect.size / 2.0;
+    Color cross_color(0.5f, 0.5f, 0.5f);
+    draw_line(center + Vector2(-15, 0), center + Vector2(15, 0), cross_color, 2.0f);
+    draw_line(center + Vector2(0, -15), center + Vector2(0, 15), cross_color, 2.0f);
 
     if (points.empty()) return;
 
+    // 3. Draw the lines
     if (points.size() >= 2) {
         PackedVector2Array gpu_points;
         for (const auto &pt : points) {
@@ -67,6 +77,7 @@ void VectorCanvas::_draw() {
         draw_polyline(gpu_points, Color(0.0f, 0.8f, 0.8f), 2.0f, true);
     }
 
+    // 4. Draw the visible dots (Teal)
     for (const auto &pt : points) {
         Color point_color = pt.is_selected ? Color(1.0f, 0.0f, 0.0f) : Color(0.0f, 0.8f, 0.8f);
         float radius = pt.is_selected ? 8.0f : 5.0f;
