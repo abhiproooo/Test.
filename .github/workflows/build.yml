@@ -49,5 +49,5 @@ jobs:
     - name: Upload Compiled Library
       uses: actions/upload-artifact@v4
       with:
-        name: android-libs
-        path: '**/*.so'
+        name: my-extension
+        path: build/libtest.android.template_debug.arm64.so
