@@ -1,18 +1,15 @@
 #!/usr/bin/env python
 import os
-import sys
 
-# The name of your final library
 env = SConscript("godot-cpp/SConstruct")
-
-# Tell SCons where to put the final .so file
 env.Append(CPPPATH=["src/"])
 sources = Glob("src/*.cpp")
 
-# Build the shared library
+lib_name = "libtest.android.template_debug.arm64"
+libpath = "bin/"
+
 library = env.SharedLibrary(
-    "demo/bin/libtest{}{}".format(env["suffix"], env["SHLIBSUFFIX"]),
+    target=os.path.join(libpath, lib_name),
     source=sources,
 )
-
 Default(library)
