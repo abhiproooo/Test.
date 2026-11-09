@@ -1,5 +1,6 @@
 #include "VectorCanvas.h"
 #include <godot_cpp/core/class_db.hpp>
+#include <godot_cpp/classes/input_event.hpp> // <--- ADDED THIS
 #include <godot_cpp/classes/input_event_screen_touch.hpp>
 
 using namespace godot;
