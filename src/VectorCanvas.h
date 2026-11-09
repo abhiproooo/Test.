@@ -1,6 +1,7 @@
 #ifndef VECTOR_CANVAS_H
 #define VECTOR_CANVAS_H
 #include <godot_cpp/classes/node2d.hpp>
+#include <godot_cpp/classes/input_event.hpp> // <--- ADDED THIS
 #include <godot_cpp/variant/packed_vector2_array.hpp>
 #include "VectorPoint.h"
 #include <vector>
