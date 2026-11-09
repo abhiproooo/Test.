@@ -38,16 +38,19 @@ jobs:
 
     - name: Compile with SCons
       run: |
-        # First, build the godot-cpp static library
         cd godot-cpp
         scons platform=android target=template_debug arch=arm64 use_llvm=yes api_version=4.7 generate_bindings=yes
         cd ..
-        
-        # Next, compile YOUR code using the static library we just built
         scons platform=android target=template_debug arch=arm64 use_llvm=yes api_version=4.7
+
+    - name: Find and Upload Compiled Library
+      run: |
+        echo "Searching for your .so file..."
+        find . -name "libtest.android*.so"
+        find . -name "libtest.android*.so" -exec cp {} . \;
 
     - name: Upload Compiled Library
       uses: actions/upload-artifact@v4
       with:
         name: my-extension
-        path: build/libtest.android.template_debug.arm64.so
+        path: "*.so"
