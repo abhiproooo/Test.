@@ -43,16 +43,8 @@ jobs:
         cd ..
         scons platform=android target=template_debug arch=arm64 use_llvm=yes api_version=4.7
 
-    - name: Find and Prepare .so File
-      run: |
-        echo "Searching for the .so file..."
-        # Find any .so file that is NOT inside the godot-cpp folder
-        find . -name "*.so" -not -path "./godot-cpp/*" -exec cp {} . \;
-        echo "Files copied to root:"
-        ls -la *.so
-
     - name: Upload Compiled Library
       uses: actions/upload-artifact@v4
       with:
-        name: my-extension
-        path: "*.so"
+        name: android-libs
+        path: demo/bin/*.so
